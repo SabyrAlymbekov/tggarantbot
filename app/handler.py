@@ -78,8 +78,9 @@ async def show_main_menu(message: Message):
 
 # wallet connect func
 async def connect_wallet(message: Message, wallet_name: str):
-    connector = get_connector(message.chat.id)
-    wallets_list = connector.get_wallets()
+    chat_id = message.chat.id
+    connector = await get_connector(chat_id)
+    wallets_list = await connector.get_wallets()
     wallet = None
 
     for w in wallets_list:
@@ -90,12 +91,14 @@ async def connect_wallet(message: Message, wallet_name: str):
         raise Exception(f'Unknown wallet: {wallet_name}')
 
     print(f"Содержимое wallet: {wallet}")
+    print("work_prev")
     try:
         generated_url = await connector.connect(wallet)
         print(generated_url)
     except Exception as e:
         print(f"Ошибка при подключении: {e}")
-
+        return
+    print("work_next")
     mk_b = InlineKeyboardBuilder()
     mk_b.button(text='Connect', url=generated_url)
 
