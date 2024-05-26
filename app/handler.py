@@ -80,7 +80,7 @@ async def show_main_menu(message: Message):
 async def connect_wallet(message: Message, wallet_name: str):
     chat_id = message.chat.id
     connector = await get_connector(chat_id)
-    wallets_list = await connector.get_wallets()
+    wallets_list = connector.get_wallets()
     wallet = None
 
     for w in wallets_list:
