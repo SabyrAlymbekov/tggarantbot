@@ -78,28 +78,28 @@ async def show_main_menu(message: Message):
 
 # wallet connect func
 async def connect_wallet(message: Message, wallet_name: str):
-    print("work0")
-    user_id = message.from_user.id
     connector = get_connector(message.chat.id)
-    print("work1")
     wallets_list = connector.get_wallets()
-    print("work2")
     wallet = None
 
     for w in wallets_list:
         if w['name'] == wallet_name:
             wallet = w
-    print("work3")
+
     if wallet is None:
         raise Exception(f'Unknown wallet: {wallet_name}')
-    print(wallet)
 
-    generated_url = await connector.connect(wallet)
-    print("work4")
+    print(f"Содержимое wallet: {wallet}")
+    try:
+        generated_url = await connector.connect(wallet)
+        print(generated_url)
+    except Exception as e:
+        print(f"Ошибка при подключении: {e}")
+
     mk_b = InlineKeyboardBuilder()
     mk_b.button(text='Connect', url=generated_url)
 
-    await message.answer(text='Подключите кошелек в течение 3-х минут', reply_markup=mk_b.as_markup())
+    await message.answer(text='Connect wallet within 3 minutes', reply_markup=mk_b.as_markup())
 
     mk_b = InlineKeyboardBuilder()
     mk_b.button(text='Start', callback_data='start')
@@ -110,9 +110,10 @@ async def connect_wallet(message: Message, wallet_name: str):
             if connector.account.address:
                 wallet_address = connector.account.address
                 wallet_address = Address(wallet_address).to_str(is_bounceable=False)
-                await message.answer(f'Вы были подключены через адрес: <code>{wallet_address}</code>', reply_markup=mk_b.as_markup())
+                await message.answer(f'You are connected with address <code>{wallet_address}</code>', reply_markup=mk_b.as_markup())
                 logger.info(f'Connected with address: {wallet_address}')
             return
+
     await message.answer(f'Timeout error!', reply_markup=mk_b.as_markup())
 
 # 
